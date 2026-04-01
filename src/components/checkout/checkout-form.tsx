@@ -141,7 +141,7 @@ export function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error ?? 'No se pudo iniciar Mercado Pago.')
+      throw new Error(data.details ?? data.error ?? 'No se pudo iniciar Mercado Pago.')
     }
 
     if (!data.initPoint) {

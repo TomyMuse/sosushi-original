@@ -76,12 +76,43 @@ export async function POST(request: Request) {
   })
 
   if (!response.ok) {
-    const errorText = await response.text()
+    let errorBody: unknown = null
+
+    try {
+      errorBody = await response.json()
+    } catch {
+      errorBody = await response.text()
+    }
+
+    const parsedError =
+      typeof errorBody === 'object' && errorBody !== null
+        ? (errorBody as {
+            message?: string
+            error?: string
+            cause?: Array<{ description?: string; code?: string }>
+          })
+        : null
+
+    const details = parsedError?.cause
+      ?.map((cause) => cause.description ?? cause.code)
+      .filter(Boolean)
+      .join(' | ')
+
+    const finalMessage =
+      details ||
+      parsedError?.message ||
+      parsedError?.error ||
+      (typeof errorBody === 'string' ? errorBody : 'Mercado Pago rechazo la preferencia de pago.')
+
+    console.error('Mercado Pago preference error', {
+      status: response.status,
+      body: errorBody,
+    })
 
     return NextResponse.json(
       {
         error: 'Mercado Pago rechazo la preferencia de pago.',
-        details: errorText,
+        details: finalMessage,
       },
       { status: 502 }
     )
