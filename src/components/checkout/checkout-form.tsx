@@ -77,44 +77,95 @@ export function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
   const getItemSummary = (summary?: string, sizeLabel?: string, pieces?: number) =>
     summary ?? `${sizeLabel} - ${pieces} piezas`
 
-  const handleSubmit = async () => {
+  const validateCustomerData = () => {
     if (!formData.customerName.trim()) {
       toast.error('Ingresa tu nombre.')
-      return
+      return false
     }
     if (!formData.customerPhone.trim()) {
       toast.error('Ingresa tu telefono.')
-      return
+      return false
     }
     if (!formData.customerAddress.trim()) {
       toast.error('Ingresa tu direccion.')
+      return false
+    }
+
+    return true
+  }
+
+  const handleTransferSubmit = async () => {
+    const orderId = createOrderReference()
+    const message = buildOrderWhatsAppMessage(formData, {
+      orderId,
+      items,
+      subtotal,
+      discountAmount,
+      total,
+      discount,
+    })
+    const url = buildWhatsAppUrl(message)
+    const popup = window.open(url, '_blank', 'noopener,noreferrer')
+
+    if (!popup) {
+      window.location.href = url
+    }
+
+    clearCart()
+    onSuccess(orderId)
+    toast.success('Tu pedido se abrio en WhatsApp para que puedas confirmarlo.')
+  }
+
+  const handleMercadoPagoSubmit = async () => {
+    const orderId = createOrderReference()
+
+    const response = await fetch('/api/payments/preference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderId,
+        customerName: formData.customerName.trim(),
+        customerPhone: formData.customerPhone.trim(),
+        customerAddress: formData.customerAddress.trim(),
+        observations: formData.observations.trim(),
+        items,
+        subtotal,
+        discountAmount,
+        total,
+        discount,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error ?? 'No se pudo iniciar Mercado Pago.')
+    }
+
+    if (!data.initPoint) {
+      throw new Error('Mercado Pago no devolvio una URL de checkout.')
+    }
+
+    window.location.href = data.initPoint
+  }
+
+  const handleSubmit = async () => {
+    if (!validateCustomerData()) {
       return
     }
 
     setIsSubmitting(true)
 
     try {
-      const orderId = createOrderReference()
-      const message = buildOrderWhatsAppMessage(formData, {
-        orderId,
-        items,
-        subtotal,
-        discountAmount,
-        total,
-        discount,
-      })
-      const url = buildWhatsAppUrl(message)
-      const popup = window.open(url, '_blank', 'noopener,noreferrer')
-
-      if (!popup) {
-        window.location.href = url
+      if (formData.paymentMethod === 'mercadopago') {
+        await handleMercadoPagoSubmit()
+      } else {
+        await handleTransferSubmit()
       }
-
-      clearCart()
-      onSuccess(orderId)
-      toast.success('Tu pedido se abrio en WhatsApp para que puedas confirmarlo.')
-    } catch {
-      toast.error('No se pudo abrir WhatsApp. Intenta nuevamente.')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo continuar con el pago.')
     } finally {
       setIsSubmitting(false)
     }
@@ -244,7 +295,7 @@ export function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                           Mercado Pago
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Te enviamos el detalle para coordinar el pago por WhatsApp.
+                          Seras redirigido al checkout seguro de Mercado Pago.
                         </p>
                       </div>
                     </Label>
@@ -381,7 +432,9 @@ export function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                   </div>
 
                   <p className="text-sm text-muted-foreground">
-                    Al continuar se abrira WhatsApp con tu pedido completo listo para confirmar.
+                    {formData.paymentMethod === 'mercadopago'
+                      ? 'Al continuar se abrira Mercado Pago para completar el pago.'
+                      : 'Al continuar se abrira WhatsApp con tu pedido completo listo para confirmar.'}
                   </p>
 
                   <Button
@@ -390,7 +443,9 @@ export function CheckoutForm({ onBack, onSuccess }: CheckoutFormProps) {
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Enviar pedido por WhatsApp
+                    {formData.paymentMethod === 'mercadopago'
+                      ? 'Pagar con Mercado Pago'
+                      : 'Enviar pedido por WhatsApp'}
                   </Button>
                 </CardContent>
               </Card>
