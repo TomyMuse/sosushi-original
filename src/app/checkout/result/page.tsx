@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { AlertCircle, CheckCircle2, Clock3, ShoppingBag } from 'lucide-react'
@@ -31,7 +31,7 @@ const statusCopy = {
   },
 } as const
 
-export default function CheckoutResultPage() {
+function CheckoutResultContent() {
   const searchParams = useSearchParams()
   const clearCart = useCartStore((state) => state.clearCart)
 
@@ -53,63 +53,85 @@ export default function CheckoutResultPage() {
   const Icon = current.icon
 
   return (
+    <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
+      <Card className="glass w-full max-w-2xl border-gold-500/15">
+        <CardHeader className="pb-4 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-gold-500/20 bg-black/20">
+              <Icon className={`h-10 w-10 ${current.iconClass}`} />
+            </div>
+          </div>
+          <CardTitle className="text-3xl text-white">{current.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 text-center">
+          <p className="mx-auto max-w-xl text-lg leading-relaxed text-white/70">
+            {current.description}
+          </p>
+
+          <div className="space-y-2 rounded-2xl border border-gold-500/12 bg-black/20 p-5 text-left">
+            {externalReference ? (
+              <p className="text-sm text-white/65">
+                Pedido: <span className="font-medium text-white">{externalReference}</span>
+              </p>
+            ) : null}
+            {paymentId ? (
+              <p className="text-sm text-white/65">
+                Pago: <span className="font-medium text-white">{paymentId}</span>
+              </p>
+            ) : null}
+            <p className="text-sm text-white/65">
+              Local: <span className="font-medium text-white">{siteConfig.brandName}</span>
+            </p>
+          </div>
+
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Button asChild className="btn-gold">
+              <Link href="/">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                Volver al menu
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="border-gold-500/30 bg-black/20 text-white hover:bg-white/10 hover:text-white"
+            >
+              <a
+                href={`https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(
+                  externalReference
+                    ? `Hola ${siteConfig.brandName}, quiero consultar por mi pedido ${externalReference}.`
+                    : `Hola ${siteConfig.brandName}, quiero consultar por mi pago.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Escribir por WhatsApp
+              </a>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </main>
+  )
+}
+
+export default function CheckoutResultPage() {
+  return (
     <div className="relative min-h-screen overflow-hidden">
       <CosmicBackground />
-      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
-        <Card className="glass w-full max-w-2xl border-gold-500/15">
-          <CardHeader className="pb-4 text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-gold-500/20 bg-black/20">
-                <Icon className={`h-10 w-10 ${current.iconClass}`} />
-              </div>
-            </div>
-            <CardTitle className="text-3xl text-white">{current.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6 text-center">
-            <p className="mx-auto max-w-xl text-lg leading-relaxed text-white/70">
-              {current.description}
-            </p>
-
-            <div className="space-y-2 rounded-2xl border border-gold-500/12 bg-black/20 p-5 text-left">
-              {externalReference ? (
-                <p className="text-sm text-white/65">
-                  Pedido: <span className="font-medium text-white">{externalReference}</span>
-                </p>
-              ) : null}
-              {paymentId ? (
-                <p className="text-sm text-white/65">
-                  Pago: <span className="font-medium text-white">{paymentId}</span>
-                </p>
-              ) : null}
-              <p className="text-sm text-white/65">
-                Local: <span className="font-medium text-white">{siteConfig.brandName}</span>
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-center gap-3 sm:flex-row">
-              <Button asChild className="btn-gold">
-                <Link href="/">
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Volver al menu
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-gold-500/30 bg-black/20 text-white hover:bg-white/10 hover:text-white">
-                <a
-                  href={`https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(
-                    externalReference
-                      ? `Hola ${siteConfig.brandName}, quiero consultar por mi pedido ${externalReference}.`
-                      : `Hola ${siteConfig.brandName}, quiero consultar por mi pago.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Escribir por WhatsApp
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+      <Suspense
+        fallback={
+          <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
+            <Card className="glass w-full max-w-xl border-gold-500/15">
+              <CardContent className="py-14 text-center text-white/70">
+                Cargando estado del pago...
+              </CardContent>
+            </Card>
+          </main>
+        }
+      >
+        <CheckoutResultContent />
+      </Suspense>
     </div>
   )
 }
