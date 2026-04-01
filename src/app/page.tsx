@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CheckCircle, ChevronLeft, ChevronRight, Loader2, ShoppingBag } from 'lucide-react'
+import { CheckCircle, ChevronLeft, ChevronRight, Loader2, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import { CartDrawer } from '@/components/cart/cart-drawer'
 import { CheckoutForm } from '@/components/checkout/checkout-form'
@@ -539,7 +539,7 @@ export default function Home() {
               className="fixed bottom-8 right-8 z-50 lg:hidden"
             >
               <Button onClick={handleCartClick} className="btn-gold h-16 px-8 text-xl shadow-lg">
-                <ShoppingBag className="mr-3 h-6 w-6" />
+                <ShoppingCart className="mr-3 h-6 w-6" />
                 <span className="font-semibold">{formatPrice(total)}</span>
                 <Badge className="ml-3 bg-black/30 px-3 text-lg text-white hover:bg-black/30">
                   {itemCount}

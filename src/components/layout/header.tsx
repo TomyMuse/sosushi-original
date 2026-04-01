@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Menu, ShoppingBag } from 'lucide-react'
+import { Menu, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -71,7 +71,7 @@ export function Header({ onCartClick }: HeaderProps) {
                 className="relative h-11 w-11 text-white"
                 onClick={onCartClick}
               >
-                <ShoppingBag className="h-5 w-5" />
+                <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
                   <Badge
                     variant="default"

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { AlertCircle, CheckCircle2, Clock3, ShoppingBag } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Clock3, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CosmicBackground } from '@/components/ui/cosmic-background'
@@ -88,7 +88,7 @@ export default function CheckoutResultStatusPage() {
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild className="btn-gold">
                 <Link href="/">
-                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  <ShoppingCart className="mr-2 h-4 w-4" />
                   Volver al menu
                 </Link>
               </Button>

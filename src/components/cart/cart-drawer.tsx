@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2, Minus, Plus, ShoppingBag, Tag, Trash2 } from 'lucide-react'
+import { Loader2, Minus, Plus, ShoppingCart, Tag, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -85,12 +85,12 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex w-full flex-col p-0 sm:max-w-lg"
+        className="flex h-full min-h-0 w-full flex-col overflow-hidden p-0 sm:max-w-lg"
         style={{ background: 'rgba(10, 10, 20, 0.95)' }}
       >
-        <SheetHeader className="border-b border-gold-500/10 p-5">
+        <SheetHeader className="shrink-0 border-b border-gold-500/10 p-5">
           <SheetTitle className="flex items-center gap-3 text-2xl">
-            <ShoppingBag className="h-6 w-6 text-gold-500" />
+            <ShoppingCart className="h-6 w-6 text-gold-500" />
             Tu pedido
           </SheetTitle>
           <SheetDescription className="text-lg">
@@ -103,7 +103,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
             <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-secondary">
-              <ShoppingBag className="h-12 w-12 text-muted-foreground" />
+              <ShoppingCart className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="mb-3 text-xl font-semibold">Carrito vacio</h3>
             <p className="mb-6 text-lg text-muted-foreground">
@@ -120,7 +120,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
           </div>
         ) : (
           <>
-            <ScrollArea className="flex-1">
+            <ScrollArea className="min-h-0 flex-1">
               <div className="space-y-5 p-5">
                 <AnimatePresence mode="popLayout">
                   {items.map((item) => (
@@ -182,7 +182,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
               </div>
             </ScrollArea>
 
-            <div className="space-y-4 border-t border-gold-500/10 p-5">
+            <div className="shrink-0 space-y-4 border-t border-gold-500/10 p-5">
               {discount ? (
                 <div className="flex items-center justify-between rounded-xl bg-gold-500/10 p-4">
                   <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
               )}
             </div>
 
-            <div className="space-y-3 border-t border-gold-500/10 p-5">
+            <div className="shrink-0 space-y-3 border-t border-gold-500/10 p-5">
               <div className="flex justify-between text-lg">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatPrice(subtotal)}</span>
@@ -247,7 +247,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
               </div>
             </div>
 
-            <div className="border-t border-gold-500/10 p-5">
+            <div className="shrink-0 border-t border-gold-500/10 p-5">
               <Button className="h-14 w-full text-xl btn-gold" onClick={handleCheckout}>
                 Continuar
               </Button>
