@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
@@ -85,7 +84,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex h-full min-h-0 w-full flex-col overflow-hidden p-0 sm:max-w-lg"
+        className="flex h-[100dvh] max-h-[100dvh] min-h-0 w-full flex-col overflow-hidden p-0 sm:max-w-lg"
         style={{ background: 'rgba(10, 10, 20, 0.95)' }}
       >
         <SheetHeader className="shrink-0 border-b border-gold-500/10 p-5">
@@ -120,8 +119,11 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
           </div>
         ) : (
           <>
-            <ScrollArea className="min-h-0 flex-1">
-              <div className="space-y-5 p-5">
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 touch-pan-y"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              <div className="space-y-5">
                 <AnimatePresence mode="popLayout">
                   {items.map((item) => (
                     <motion.div
@@ -180,7 +182,7 @@ export function CartDrawer({ open, onOpenChange, onCheckout }: CartDrawerProps) 
                   ))}
                 </AnimatePresence>
               </div>
-            </ScrollArea>
+            </div>
 
             <div className="shrink-0 space-y-4 border-t border-gold-500/10 p-5">
               {discount ? (
