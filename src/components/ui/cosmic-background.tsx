@@ -8,17 +8,19 @@ export function CosmicBackground() {
   const starsCanvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const bgCanvas = bgCanvasRef.current
-    const nebulaCanvas = nebulaCanvasRef.current
-    const starsCanvas = starsCanvasRef.current
+    const bgCanvasEl = bgCanvasRef.current
+    const nebulaCanvasEl = nebulaCanvasRef.current
+    const starsCanvasEl = starsCanvasRef.current
 
-    if (!bgCanvas || !nebulaCanvas || !starsCanvas) return
+    if (!bgCanvasEl || !nebulaCanvasEl || !starsCanvasEl) return
 
-    const bgCtx = bgCanvas.getContext('2d')
-    const nebulaCtx = nebulaCanvas.getContext('2d')
-    const starsCtx = starsCanvas.getContext('2d')
+    const bgCtx = bgCanvasEl.getContext('2d')!
+    const nebulaCtx = nebulaCanvasEl.getContext('2d')!
+    const starsCtx = starsCanvasEl.getContext('2d')!
 
-    if (!bgCtx || !nebulaCtx || !starsCtx) return
+    const bgCanvas = bgCanvasEl
+    const nebulaCanvas = nebulaCanvasEl
+    const starsCanvas = starsCanvasEl
 
     let W: number
     let H: number

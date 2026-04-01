@@ -2,6 +2,18 @@ import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import { randomBytes, createHash } from 'crypto'
 
+const authDb = db as typeof db & {
+  session: {
+    create: (args: unknown) => Promise<unknown>
+    findUnique: (args: unknown) => Promise<{
+      userId: string
+      expiresAt: Date
+    } | null>
+    delete: (args: unknown) => Promise<unknown>
+    deleteMany: (args: unknown) => Promise<unknown>
+  }
+}
+
 // Force reload - v2
 
 // Rate limiting store (in-memory, resets on server restart)
@@ -84,7 +96,7 @@ export function generateSessionExpiry(): Date {
 }
 
 export async function createSession(userId: string, token: string, expiresAt: Date) {
-  await db.session.create({
+  await authDb.session.create({
     data: {
       userId,
       token,
@@ -96,7 +108,7 @@ export async function createSession(userId: string, token: string, expiresAt: Da
 export async function validateSession(token: string): Promise<{ valid: boolean; userId?: string }> {
   if (!token) return { valid: false }
   
-  const session = await db.session.findUnique({
+  const session = await authDb.session.findUnique({
     where: { token },
     include: { user: { select: { id: true, role: true } } }
   })
@@ -104,7 +116,7 @@ export async function validateSession(token: string): Promise<{ valid: boolean; 
   if (!session) return { valid: false }
   
   if (new Date() > session.expiresAt) {
-    await db.session.delete({ where: { token } })
+    await authDb.session.delete({ where: { token } })
     return { valid: false }
   }
   
@@ -113,14 +125,14 @@ export async function validateSession(token: string): Promise<{ valid: boolean; 
 
 export async function deleteSession(token: string) {
   try {
-    await db.session.delete({ where: { token } })
+    await authDb.session.delete({ where: { token } })
   } catch {
     // Session might not exist
   }
 }
 
 export async function cleanupExpiredSessions() {
-  await db.session.deleteMany({
+  await authDb.session.deleteMany({
     where: {
       expiresAt: { lt: new Date() }
     }
