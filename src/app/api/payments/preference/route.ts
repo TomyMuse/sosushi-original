@@ -58,12 +58,12 @@ export async function POST(request: Request) {
     external_reference: body.orderId,
     statement_descriptor: 'SOSUSHI',
     back_urls: {
-      success: `${baseUrl}/checkout/result/success`,
-      pending: `${baseUrl}/checkout/result/pending`,
-      failure: `${baseUrl}/checkout/result/failure`,
+      success: new URL('/checkout/result/success', baseUrl).toString(),
+      pending: new URL('/checkout/result/pending', baseUrl).toString(),
+      failure: new URL('/checkout/result/failure', baseUrl).toString(),
     },
     auto_return: 'approved',
-    notification_url: `${baseUrl}/api/payments/webhook`,
+    notification_url: new URL('/api/payments/webhook', baseUrl).toString(),
     metadata: {
       orderId: body.orderId,
       customerName: body.customerName,
@@ -118,6 +118,9 @@ export async function POST(request: Request) {
 
     console.error('Mercado Pago preference error', {
       status: response.status,
+      baseUrl,
+      backUrls: preferencePayload.back_urls,
+      notificationUrl: preferencePayload.notification_url,
       body: errorBody,
     })
 

@@ -44,19 +44,31 @@ export function resolveAppBaseUrl(request: Request) {
 }
 
 export function ensureMercadoPagoCompatibleUrl(baseUrl: string) {
-  const normalized = baseUrl.replace(/\/$/, '')
+  const normalized = baseUrl.trim()
 
-  if (!/^https:\/\//i.test(normalized)) {
+  let parsedUrl: URL
+
+  try {
+    parsedUrl = new URL(normalized)
+  } catch {
+    throw new Error(
+      'La URL publica configurada para Mercado Pago no es valida. Usa un dominio completo como https://tudominio.com'
+    )
+  }
+
+  const origin = parsedUrl.origin
+
+  if (!/^https:\/\//i.test(origin)) {
     throw new Error(
       'Mercado Pago requiere una URL publica con HTTPS para back_urls y webhook.'
     )
   }
 
-  if (/localhost|127\.0\.0\.1/i.test(normalized)) {
+  if (/localhost|127\.0\.0\.1/i.test(origin)) {
     throw new Error(
       'Mercado Pago no acepta localhost en back_urls. Configura NEXT_PUBLIC_SITE_URL con tu dominio publico.'
     )
   }
 
-  return normalized
+  return origin
 }
