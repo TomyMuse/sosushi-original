@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import {
+  ensureMercadoPagoCompatibleUrl,
   formatMercadoPagoItemTitle,
   resolveAppBaseUrl,
   type MercadoPagoPreferenceRequest,
@@ -32,7 +33,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'El carrito esta vacio.' }, { status: 400 })
   }
 
-  const baseUrl = resolveAppBaseUrl(request)
+  let baseUrl: string
+
+  try {
+    baseUrl = ensureMercadoPagoCompatibleUrl(resolveAppBaseUrl(request))
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'URL publica invalida para Mercado Pago.',
+      },
+      { status: 400 }
+    )
+  }
 
   const preferencePayload = {
     items: body.items.map((item) => ({
@@ -46,9 +58,9 @@ export async function POST(request: Request) {
     external_reference: body.orderId,
     statement_descriptor: 'SOSUSHI',
     back_urls: {
-      success: `${baseUrl}/checkout/result?status=success`,
-      pending: `${baseUrl}/checkout/result?status=pending`,
-      failure: `${baseUrl}/checkout/result?status=failure`,
+      success: `${baseUrl}/checkout/result/success`,
+      pending: `${baseUrl}/checkout/result/pending`,
+      failure: `${baseUrl}/checkout/result/failure`,
     },
     auto_return: 'approved',
     notification_url: `${baseUrl}/api/payments/webhook`,
