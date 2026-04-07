@@ -299,3 +299,23 @@
 .category-nav-scroll.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Fly to cart animation */
+@keyframes flyToCart {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+}
+
+.animate-fly {
+  animation: flyToCart 0.8s ease-in-out forwards;
+}

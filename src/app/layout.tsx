@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from '@/components/ui/sonner'
+import { ClientProviders } from '@/components/providers/client-providers'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -49,7 +50,9 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning className="dark">
       <body className="font-sans text-xl antialiased text-foreground">
-        {children}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
         <Toaster position="top-center" />
       </body>
     </html>

@@ -13,6 +13,8 @@ import { ProductCard } from '@/components/product/product-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CosmicBackground } from '@/components/ui/cosmic-background'
+import { ScrollToTop, ScrollToTopDesktop } from '@/components/ui/scroll-to-top'
+import { ProductFilters, type FilterType } from '@/components/ui/product-filters'
 import { storefrontCategories } from '@/data/storefront'
 import { useCartItemCount, useCartTotal } from '@/store/cart-store'
 
@@ -28,6 +30,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [canScrollCategoriesLeft, setCanScrollCategoriesLeft] = useState(false)
   const [canScrollCategoriesRight, setCanScrollCategoriesRight] = useState(false)
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all')
   const categoryNavRef = useRef<HTMLDivElement>(null)
   const autoScrollFrameRef = useRef<number | null>(null)
   const autoScrollDirectionRef = useRef(1)
@@ -41,6 +44,33 @@ export default function Home() {
     .flatMap((category) => category.products)
     .filter((product) => product.isPopular)
     .slice(0, 4)
+
+  const filteredCategories = (): Category[] => {
+    if (activeFilter === 'all') return categories
+    
+    return categories.map((category) => ({
+      ...category,
+      products: [...category.products].sort((a, b) => {
+        const minPriceA = Math.min(...a.sizes.map((s) => s.price))
+        const minPriceB = Math.min(...b.sizes.map((s) => s.price))
+        
+        if (activeFilter === 'popular') {
+          if (a.isPopular && !b.isPopular) return -1
+          if (!a.isPopular && b.isPopular) return 1
+        }
+        
+        if (activeFilter === 'price-low') {
+          return minPriceA - minPriceB
+        }
+        
+        if (activeFilter === 'price-high') {
+          return minPriceB - minPriceA
+        }
+        
+        return 0
+      }),
+    }))
+  }
 
   useEffect(() => {
     try {
@@ -198,12 +228,25 @@ export default function Home() {
       maximumFractionDigits: 0,
     }).format(price)
 
+  const handleProductSelect = (categorySlug: string, productId: string) => {
+    const section = document.getElementById(categorySlug)
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => {
+        const productElement = document.getElementById(productId)
+        if (productElement) {
+          productElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 300)
+    }
+  }
+
   if (view === 'success') {
     return (
       <div className="relative flex min-h-screen flex-col">
         <CosmicBackground />
         <div className="relative z-10 flex min-h-screen flex-col">
-          <Header onCartClick={handleCartClick} />
+          <Header onCartClick={handleCartClick} categories={categories} onProductSelect={handleProductSelect} />
           <main className="flex flex-1 items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -250,7 +293,7 @@ export default function Home() {
       <CosmicBackground />
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        <Header onCartClick={handleCartClick} />
+        <Header onCartClick={handleCartClick} categories={categories} onProductSelect={handleProductSelect} />
 
         <main className="flex-1">
           <section className="relative overflow-hidden py-20 md:py-28">
@@ -518,11 +561,19 @@ export default function Home() {
                   <p className="text-xl text-muted-foreground">No hay productos disponibles</p>
                 </div>
               ) : (
-                <div className="space-y-20">
-                  {categories.map((category) => (
-                    <CategorySection key={category.id} category={category} />
-                  ))}
-                </div>
+                <>
+                  <div className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
+                    <ProductFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+                    <p className="text-sm text-white/50">
+                      {filteredCategories().reduce((acc, cat) => acc + cat.products.length, 0)} productos
+                    </p>
+                  </div>
+                  <div className="space-y-20">
+                    {filteredCategories().map((category) => (
+                      <CategorySection key={category.id} category={category} />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </section>
@@ -550,6 +601,9 @@ export default function Home() {
         </AnimatePresence>
 
         <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} onCheckout={handleCheckout} />
+        
+        <ScrollToTop />
+        <ScrollToTopDesktop />
       </div>
     </div>
   )

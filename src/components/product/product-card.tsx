@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Plus, Sparkles } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { formatPrice } from '@/lib/storefront'
 import { useCartStore, type CartItem } from '@/store/cart-store'
+import { FlyToCartContext } from '@/components/ui/fly-to-cart'
 
 export interface ProductSize {
   id: string
@@ -41,6 +42,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
+  const flyToCart = useContext(FlyToCartContext)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const selectedSize = product.sizes.find((size) => size.id === selectedSizeId)
 
@@ -64,6 +67,11 @@ export function ProductCard({ product }: ProductCardProps) {
 
     addItem(cartItem)
 
+    if (flyToCart && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      flyToCart.addFlyingItem(product.name, rect.left + rect.width / 2, rect.top + rect.height / 2)
+    }
+
     window.setTimeout(() => {
       setIsAdding(false)
       setShowSuccess(true)
@@ -73,6 +81,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div
+      id={product.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -146,6 +155,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <motion.div whileTap={{ scale: 0.95 }}>
             <Button
+              ref={buttonRef}
               onClick={handleAddToCart}
               disabled={isAdding || !selectedSize}
               className="btn-gold relative h-14 w-full overflow-hidden text-xl"
