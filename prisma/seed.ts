@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 
 const adminUser = {
   email: 'admin@sosushi.com',
-  password: '$2a$10$YourHashedPasswordHere',
+  password: 'admin123',
   name: 'Admin',
   role: 'admin',
 }
