@@ -39,7 +39,7 @@ export function LoginForm() {
       }
 
       toast.success('Bienvenido al panel de admin')
-      router.push('/admin')
+      window.location.href = '/admin'
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al iniciar sesión')
     } finally {
