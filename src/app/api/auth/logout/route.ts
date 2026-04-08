@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function POST(request: Request) {
   try {
-    const cookie = request.headers.get('cookie')
-    const sessionCookie = cookie?.match(/admin-session=([^;]+)/)?.[1]
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('admin-session')?.value
 
     if (sessionCookie) {
       const [, token] = sessionCookie.split(':')

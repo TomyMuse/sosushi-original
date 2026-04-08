@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 
 export async function GET(request: Request) {
   try {
-    const cookie = request.headers.get('cookie')
-    const sessionCookie = cookie?.match(/admin-session=([^;]+)/)?.[1]
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('admin-session')?.value
 
     if (!sessionCookie) {
       return NextResponse.json(
