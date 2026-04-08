@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag },
   { href: '/admin/productos', label: 'Productos', icon: ShoppingBag },
   { href: '/admin/categorias', label: 'Categorías', icon: FolderTree },
   { href: '/admin/descuentos', label: 'Descuentos', icon: Tag },
