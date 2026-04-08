@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Save, Loader2, Building2, MessageCircle, Instagram, Phone, MapPin, Clock } from 'lucide-react'
+import { Save, Loader2, Building2, MessageCircle, Instagram } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'

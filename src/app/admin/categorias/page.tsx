@@ -334,3 +334,7 @@ export function CategoriesManager() {
     </div>
   )
 }
+
+export default function CategoriesAdminPage() {
+  return <CategoriesManager />
+}
